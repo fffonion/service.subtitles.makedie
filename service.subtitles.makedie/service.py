@@ -282,7 +282,7 @@ def CalcFileHash(a):
 
 def getSubByTitle(title, langs):
     subtitles_list = []
-    url = 'http://sub.makedie.me/sub/?searchword=%s&utm_source=xbmc' % title
+    url = 'http://sub.makedie.me/sub/?searchword=%s&utm_source=xbmc&utm_medium=xbmc&utm_campaign=search' % title
     socket = urllib.urlopen( url )
     data = socket.read()
     socket.close()

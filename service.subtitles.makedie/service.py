@@ -297,6 +297,9 @@ def getSubByTitle(title, langs):
             # if match:
             #     version = match[3:].encode('utf-8').strip().replace('\n','')
             #     if version: name = version
+            subtype = re.findall("格式：\s*([^\(]+)(?:\(\?\))*".decode('utf-8'), it.ul.li.text.strip())
+            if subtype and subtype[0] and subtype[0]!=u'\u4e0d\u660e':#不明
+                name = '[' + subtype[0].encode('utf-8') + '] ' + name
             rating = str(int(it.ul.img['src'].split('/')[-1].split('.')[0])/20)
             match = it.find(text=re.compile("语言：".decode('utf-8')))
             if match:
@@ -341,6 +344,7 @@ def Search(item):
 
     if item['mansearch']:
         title = item['mansearchstr']
+        getSubByTitle(title, item['3let_language'])
     else:
         title = '%s %s' % (item['title'], item['year'])
         getSubByTitle(title, item['3let_language'])

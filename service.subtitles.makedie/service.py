@@ -19,6 +19,7 @@ import zlib
 import random
 from urlparse import urlparse
 from bs4 import BeautifulSoup
+import html5lib
 
 __addon__ = xbmcaddon.Addon()
 __author__     = __addon__.getAddonInfo('author')
@@ -285,8 +286,8 @@ def getSubByTitle(title, langs):
     url = 'http://sub.makedie.me/sub/?searchword=%s&utm_source=xbmc&utm_medium=xbmc&utm_campaign=search' % title
     socket = urllib.urlopen( url )
     data = socket.read()
+    soup = BeautifulSoup(data, 'html5lib')
     socket.close()
-    soup = BeautifulSoup(data)
     results = soup.find_all("div", attrs={"class":"subitem"})
     for it in results:
             name = it.find("a", attrs={"class":"introtitle"})['title'].encode('utf-8').strip()

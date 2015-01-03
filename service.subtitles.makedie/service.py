@@ -307,7 +307,7 @@ def getSubByTitle(title, langs):
                 if '简' in match or '繁' in match or '双语' in match:
                     subtitles_list.append({"language_name":"Chinese", "filename":name, "id":id, "language_flag":'zh', "rating":rating})
                 else:
-                    subtitles_list.append({"language_name":"Unknown", "filename":name, "id":id, "language_flag":'zh', "rating":rating})#default to chinese
+                    subtitles_list.append({"language_name":"", "filename":name, "id":id, "language_flag":'zh', "rating":rating})#default to chinese
             elif 'eng' in langs and '英' in match:
                 subtitles_list.append({"language_name":"English", "filename":name, "id":id, "language_flag":'en', "rating":rating})
             

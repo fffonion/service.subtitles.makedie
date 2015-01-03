@@ -39,6 +39,10 @@ SVP_REV_NUMBER = 1543
 CLIENTKEY = "SP,aerSP,aer %d &e(\xd7\x02 %s %s"
 RETRY = 3
 
+class AppURLopener(urllib.FancyURLopener):
+    version = "XBMC-subtitle/1.0" #cf block default ua
+urllib._urlopener = AppURLopener()
+
 def log(module, msg):
     xbmc.log((u"%s::%s - %s" % (__scriptname__,module,msg,)).encode('utf-8'),level=xbmc.LOGDEBUG )
 
@@ -275,31 +279,38 @@ def CalcFileHash(a):
         return result
     return a
 
+
 def getSubByTitle(title, langs):
     subtitles_list = []
-    url = 'http://www.shooter.cn/search/%s/' % title
+    url = 'http://sub.makedie.me/sub/?searchword=%s&utm_source=xbmc' % title
     socket = urllib.urlopen( url )
     data = socket.read()
     socket.close()
     soup = BeautifulSoup(data)
     results = soup.find_all("div", attrs={"class":"subitem"})
     for it in results:
-            name = it.find("div", attrs={"class":"sublist_box_title"}).text.encode('utf-8').strip()
-            id = re.search('local_downfile\(this,(\d+)\);',
-                                  it.find("div", attrs={"class":"sublist_box_title"}).find(onclick=True)['onclick'].encode('utf-8')
+            name = it.find("a", attrs={"class":"introtitle"})['title'].encode('utf-8').strip()
+            id = re.search('/xml/sub/\d+/(\d+).xml',
+                                  it.find("a", attrs={"class":"introtitle"})['href'].encode('utf-8')
                                   ).group(1)
-            match = it.find(text=re.compile("调校：*".decode('utf-8')))
-            if match:
-                version = match[3:].encode('utf-8').strip().replace('\n','')
-                if version: name = version
+            # match = it.find(text=re.compile("调校：*".decode('utf-8')))
+            # if match:
+            #     version = match[3:].encode('utf-8').strip().replace('\n','')
+            #     if version: name = version
             rating = str(int(it.ul.img['src'].split('/')[-1].split('.')[0])/20)
-            match = it.find(text=re.compile("语言：*".decode('utf-8')))
+            match = it.find(text=re.compile("语言：".decode('utf-8')))
             if match:
                 match = match.encode('utf-8')
-                if 'chi' in langs and ('简' in match or '繁' in match):
+            else:
+                match = ''
+            if 'chi' in langs:
+                if '简' in match or '繁' in match or '双语' in match:
                     subtitles_list.append({"language_name":"Chinese", "filename":name, "id":id, "language_flag":'zh', "rating":rating})
-                elif 'eng' in langs and '英' in match:
-                    subtitles_list.append({"language_name":"English", "filename":name, "id":id, "language_flag":'en', "rating":rating})
+                else:
+                    subtitles_list.append({"language_name":"Unknown", "filename":name, "id":id, "language_flag":'zh', "rating":rating})#default to chinese
+            elif 'eng' in langs and '英' in match:
+                subtitles_list.append({"language_name":"English", "filename":name, "id":id, "language_flag":'en', "rating":rating})
+            
     if subtitles_list:
         for it in subtitles_list:
             listitem = xbmcgui.ListItem(label=it["language_name"],
@@ -309,7 +320,7 @@ def getSubByTitle(title, langs):
                                   )
             listitem.setProperty( "sync", "false" )
             listitem.setProperty( "hearing_imp", "false" )
-            url = "plugin://%s/?action=download&id=%s" % (__scriptid__, it["id"])
+            url = "plugin://%s/?action=download&id=%s" % (__scriptid__, '999999'+it["id"])
             xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False)
 
 def rmtree(path):
@@ -328,10 +339,15 @@ def Search(item):
     xbmc.sleep(50)
     xbmcvfs.mkdirs(__temp__)
 
-    if 'chi' in item['3let_language']:
-        getSubByHash(item['file_original_path'], "chn", "zh", "Chinese")
-    if 'eng' in item['3let_language']:
-        getSubByHash(item['file_original_path'], "eng", "en", "English")
+    if item['mansearch']:
+        title = item['mansearchstr']
+    else:
+        title = '%s %s' % (item['title'], item['year'])
+        getSubByTitle(title, item['3let_language'])
+        if 'chi' in item['3let_language']:
+            getSubByHash(item['file_original_path'], "chn", "zh", "Chinese")
+        if 'eng' in item['3let_language']:
+            getSubByHash(item['file_original_path'], "eng", "en", "English")
 
 def ChangeFileEndcoding(filepath):
     if __addon__.getSetting("transUTF8") == "true" and os.path.splitext(filepath)[1] in [".srt", ".ssa", ".ass", ".smi"]:
@@ -371,10 +387,14 @@ def DownloadID(id):
     xbmcvfs.mkdirs(__temp__)
 
     subtitle_list = []
-    url = 'http://shooter.cn/files/file3.php?hash=duei7chy7gj59fjew73hdwh213f&fileid=%s' % (id)
-    socket = urllib.urlopen( url )
-    data = socket.read()
-    url = 'http://file0.shooter.cn%s' % (CalcFileHash(data))
+    if id.startswith('999999'):
+        url = 'http://sub.makedie.me/download/%06d/%s' %(int(id[6:]), 'XBMC.SUBTITLE')
+    else:
+        url = 'http://shooter.cn/files/file3.php?hash=duei7chy7gj59fjew73hdwh213f&fileid=%s' % (id)
+        socket = urllib.urlopen( url )
+        data = socket.read()
+        url = 'http://file0.shooter.cn%s' % (CalcFileHash(data))
+    #log(sys._getframe().f_code.co_name ,"url is %s" % (url))
     socket = urllib.urlopen( url )
     data = socket.read()
     socket.close()

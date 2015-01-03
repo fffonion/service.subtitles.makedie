@@ -1,3 +1,6 @@
+1.0.6
+- fixed: redirect search by title to fake shooter: sub.makedie.me
+
 1.0.5
 - fixed: can't get subtitles by title because website closed
 

@@ -41,7 +41,7 @@ CLIENTKEY = "SP,aerSP,aer %d &e(\xd7\x02 %s %s"
 RETRY = 3
 
 class AppURLopener(urllib.FancyURLopener):
-    version = "XBMC-subtitle/1.0" #cf block default ua
+    version = "XBMC(Kodi)-subtitle/%s" % __version__ #cf block default ua
 urllib._urlopener = AppURLopener()
 
 def log(module, msg):
@@ -348,11 +348,13 @@ def Search(item):
         getSubByTitle(title, item['3let_language'])
     else:
         title = '%s %s' % (item['title'], item['year'])
-        getSubByTitle(title, item['3let_language'])
-        if 'chi' in item['3let_language']:
-            getSubByHash(item['file_original_path'], "chn", "zh", "Chinese")
-        if 'eng' in item['3let_language']:
-            getSubByHash(item['file_original_path'], "eng", "en", "English")
+        if __addon__.getSetting("subSource") == '0':#use shooter fake 
+            getSubByTitle(title, item['3let_language'])
+        else: # use splayer api
+            if 'chi' in item['3let_language']:
+                getSubByHash(item['file_original_path'], "chn", "zh", "Chinese")
+            if 'eng' in item['3let_language']:
+                getSubByHash(item['file_original_path'], "eng", "en", "English")
 
 def ChangeFileEndcoding(filepath):
     if __addon__.getSetting("transUTF8") == "true" and os.path.splitext(filepath)[1] in [".srt", ".ssa", ".ass", ".smi"]:

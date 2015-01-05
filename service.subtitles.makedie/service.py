@@ -348,9 +348,8 @@ def Search(item):
         getSubByTitle(title, item['3let_language'])
     else:
         title = '%s %s' % (item['title'], item['year'])
-        if __addon__.getSetting("subSource") == '0':#use shooter fake 
-            getSubByTitle(title, item['3let_language'])
-        else: # use splayer api
+        getSubByTitle(title, item['3let_language'])#use shooter fake 
+        if __addon__.getSetting("subSourceAPI") == 'true': # use splayer api
             if 'chi' in item['3let_language']:
                 getSubByHash(item['file_original_path'], "chn", "zh", "Chinese")
             if 'eng' in item['3let_language']:

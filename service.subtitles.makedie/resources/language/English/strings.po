@@ -28,13 +28,6 @@ msgid "Choose subtitle file"
 msgstr ""
 
 msgctxt "#32007"
-msgid "Choose subtitle source for auto search"
+msgid "Use Shooter Player API (may become slower)"
 msgstr ""
 
-msgctxt "#32008"
-msgid "Use Shooter(fake)"
-msgstr ""
-
-msgctxt "#32009"
-msgid "Use Splayer API"
-msgstr ""

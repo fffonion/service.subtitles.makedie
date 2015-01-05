@@ -28,13 +28,6 @@ msgid "Choose subtitle file"
 msgstr "请选择要使用的字幕文件"
 
 msgctxt "#32007"
-msgid "Choose subtitle source for auto search"
-msgstr "自动搜索使用的数据源"
+msgid "Use Shooter Player API (may become slower)"
+msgstr "自动搜索时同时搜索射手影音库(可能会使搜索变慢)"
 
-msgctxt "#32008"
-msgid "Use Shooter(fake)"
-msgstr "使用伪射手网"
-
-msgctxt "#32009"
-msgid "Use Splayer API"
-msgstr "使用射手影音API"
